@@ -1,14 +1,14 @@
+Program 1. Perform the following DB operations using Cassandra.
+
+1. Create a key space by name Employee
+
 cqlsh> create keyspace Employee with replication = {
    ... 'class' : 'SimpleStrategy',
    ... 'replication_factor': 1
    ... };
    
-cqlsh> use Employee;
 
-cqlsh:employee> describe keyspaces;
-
-students       system_auth  employee            students1    
-system_schema  system       system_distributed  system_traces
+2. Create a column family by name Employee-Info with attributes Emp_Id Primary Key, Emp_Name, Designation, Date_of_Joining, Salary, Dept_Name
 
 cqlsh:employee> create table employee_info(
             ... Emp_id int PRIMARY KEY,
@@ -46,6 +46,7 @@ CREATE TABLE employee.employee_info (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
+3. Insert the values into the table in batch
 
 cqlsh:employee> begin batch
             ... insert into employee_info (emp_id,emp_name,designation,date_of_joining,salary,dept_name) values (1,'prathiksha','HR','2020-03-01',50000,'HR dept')
@@ -74,6 +75,9 @@ cqlsh:employee> select * from Employee_info;
       3 | 2020-04-30 18:30:00.000000+0000 |      technical | Software Engineer |      rahul |  60000
 
 (5 rows)
+
+4. Update Employee name and Department of Emp-Id 121
+
 cqlsh:employee> update employee_info set emp_name='prashansa',dept_name='Marketing' where emp_id=1;
 cqlsh:employee> select * from Employee_info;
 
@@ -85,4 +89,42 @@ cqlsh:employee> select * from Employee_info;
       4 | 2020-04-30 18:30:00.000000+0000 |       security |  Security Manager |  anuradha |  60000
       3 | 2020-04-30 18:30:00.000000+0000 |      technical | Software Engineer |     rahul |  60000
 
+
+5. Alter the schema of the table Employee_Info to add a column Projects which stores a set of 
+   Projects done by the corresponding Employee.
+   
+cqlsh:employee> alter table employee_info add projects text;
+cqlsh:employee> describe table Employee_info;
+
+CREATE TABLE employee.employee_info (
+    emp_id int PRIMARY KEY,
+    date_of_joining timestamp,
+    dept_name text,
+    designation text,
+    emp_name text,
+    projects text,
+    salary double
+ 
+6. Update the altered table to add project names.
+
+cqlsh:employee> begin batch
+            ... update employee_info set projects='abc' where emp_id=1
+            ... update employee_info set projects='def' where emp_id=2
+            ... update employee_info set projects='ghi' where emp_id=3
+            ... update employee_info set projects='jkl' where emp_id=4
+            ... update employee_info set projects='mno' where emp_id=5
+            ... apply batch;
+
+cqlsh:employee> select * from Employee_info;
+
+ emp_id | date_of_joining                 | dept_name      | designation       | emp_name  | projects | salary
+--------+---------------------------------+----------------+-------------------+-----------+----------+--------
+      5 | 2020-04-30 18:30:00.000000+0000 |        HR dept |       HR employee |     sonal |      mno |  60000
+      1 | 2020-02-29 18:30:00.000000+0000 |      Marketing |                HR | prashansa |      abc |  50000
+      2 | 2020-03-31 18:30:00.000000+0000 | Marketing dept |            Editor |    pranav |      def |  40000
+      4 | 2020-04-30 18:30:00.000000+0000 |       security |  Security Manager |  anuradha |      jkl |  60000
+      3 | 2020-04-30 18:30:00.000000+0000 |      technical | Software Engineer |     rahul |      ghi |  60000
+
 (5 rows)
+    
+
