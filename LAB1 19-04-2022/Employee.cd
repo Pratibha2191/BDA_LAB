@@ -90,7 +90,33 @@ cqlsh:employee> select * from Employee_info;
       3 | 2020-04-30 18:30:00.000000+0000 |      technical | Software Engineer |     rahul |  60000
 
 
-5. Alter the schema of the table Employee_Info to add a column Projects which stores a set of 
+5. Sort the details of Employee records based on salary
+
+create table emp( id int, salary int, name text,primary key(id,salary) );
+cqlsh:employee> begin batch
+            ... insert into emp(id,salary,name)values (1,10000,'prathiksha')
+            ... insert into emp(id,salary,name)values (2,10000,'pooja')
+            ... insert into emp(id,salary,name)values (3,10000,'prema')
+            ... insert into emp(id,salary,name)values (3,20000,'rahul')
+            ... insert into emp(id,salary,name)values (4,30000,'raghu')
+            ... apply batch
+            ... ;
+cqlsh:employee> paging off;
+Disabled Query paging.
+cqlsh:employee> select *from emp where id in (1,2,3,4) order by salary;
+
+ id | salary | name
+----+--------+------------
+  1 |  10000 | prathiksha
+  2 |  10000 |      pooja
+  3 |  10000 |      prema
+  3 |  20000 |      rahul
+  4 |  30000 |      raghu
+
+(5 rows)
+
+
+6. Alter the schema of the table Employee_Info to add a column Projects which stores a set of 
    Projects done by the corresponding Employee.
    
 cqlsh:employee> alter table employee_info add projects text;
@@ -105,7 +131,7 @@ CREATE TABLE employee.employee_info (
     projects text,
     salary double
  
-6. Update the altered table to add project names.
+7. Update the altered table to add project names.
 
 cqlsh:employee> begin batch
             ... update employee_info set projects='abc' where emp_id=1
