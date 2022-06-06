@@ -152,5 +152,9 @@ cqlsh:employee> select * from Employee_info;
       3 | 2020-04-30 18:30:00.000000+0000 |      technical | Software Engineer |     rahul |      ghi |  60000
 
 (5 rows)
-    
+
+8. Create a TTL of 15 seconds to display the values of Employees.
+cqlsh:employee> insert into Employee_info (emp_id,emp_name,designation,date_of_joining,salary,dept_name) 
+                values (19,'prithvi',senior_developer','2022-08-09',40000,'Developing') using TTL 50;
+
 
